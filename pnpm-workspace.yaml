@@ -1,0 +1,5 @@
+packages:
+  - 'frontend'
+  - 'contracts-sui'
+  - 'contracts-eth'
+  - 'agent'

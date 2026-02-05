@@ -1,0 +1,28 @@
+{
+  "name": "heirloom",
+  "version": "0.1.0",
+  "description": "On-Chain Will & Inheritance Protocol - Your legacy, forever on-chain",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "contracts-sui",
+    "contracts-eth",
+    "agent"
+  ],
+  "scripts": {
+    "dev": "pnpm --filter frontend dev",
+    "build": "pnpm --filter frontend build",
+    "test:sui": "cd contracts-sui && sui move test",
+    "test:eth": "cd contracts-eth && forge test"
+  },
+  "keywords": [
+    "defi",
+    "inheritance",
+    "sui",
+    "uniswap",
+    "ens",
+    "web3"
+  ],
+  "author": "DeFi Legacy Team",
+  "license": "MIT"
+}
