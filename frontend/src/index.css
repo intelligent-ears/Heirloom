@@ -151,6 +151,7 @@ a:hover {
 .btn-primary:hover {
   transform: translateY(-2px);
   box-shadow: 0 0 80px rgba(99, 102, 241, 0.5);
+  color: #ffffff;
 }
 
 .btn-secondary {
