@@ -230,7 +230,7 @@ function LandingPage() {
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                     >
-                        <h2>How It <span className="text-gold">Works</span></h2>
+                        <h2>How It <span className="text-gradient">Works</span></h2>
                         <p>Simple steps to secure your digital legacy</p>
                     </motion.div>
 
