@@ -1,6 +1,6 @@
 # 🏺 Heirloom
 
-> *"Your legacy, forever on-chain."*
+> _"Your legacy, forever on-chain."_
 
 **Cross-chain inheritance protocol with cryptographic proof-of-life mechanisms.**
 
@@ -51,7 +51,7 @@ cd contracts-eth && forge build
 ## 📁 Project Structure
 
 ```
-heirloom/
+Heirloom/
 ├── frontend/           # React + Vite + RainbowKit
 ├── contracts-sui/      # Sui Move (LegacyVault)
 ├── contracts-eth/      # Solidity (Uniswap v4 hooks + ENS)
@@ -60,12 +60,12 @@ heirloom/
 
 ## 🏆 HackMoney 2026 Tracks
 
-| Track | Prize | Our Integration |
-|-------|-------|-----------------|
-| **Sui** | $10K | Core vault logic, heartbeat state machine |
-| **Uniswap v4** | $10K | Gradual liquidation hooks |
-| **ENS** | $5K | Heir resolution, text records |
+| Track          | Prize | Our Integration                           |
+| -------------- | ----- | ----------------------------------------- |
+| **Sui**        | $10K  | Core vault logic, heartbeat state machine |
+| **Uniswap v4** | $10K  | Gradual liquidation hooks                 |
+| **ENS**        | $5K   | Heir resolution, text records             |
 
-## � License
+## 📄 License
 
-MIT
+MIT — see [LICENSE](LICENSE).
