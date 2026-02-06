@@ -62,53 +62,6 @@
     animation: float 18s ease-in-out infinite;
 }
 
-/* Navigation */
-.nav {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 100;
-    padding: var(--space-4) 0;
-    background: rgba(10, 10, 15, 0.8);
-    backdrop-filter: blur(20px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.nav-container {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.logo {
-    display: flex;
-    align-items: center;
-    gap: var(--space-2);
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: var(--color-text-primary);
-}
-
-.logo-icon {
-    color: var(--color-primary);
-}
-
-.nav-links {
-    display: flex;
-    gap: var(--space-8);
-}
-
-.nav-links a {
-    color: var(--color-text-secondary);
-    font-weight: 500;
-    transition: color var(--transition-fast);
-}
-
-.nav-links a:hover {
-    color: var(--color-text-primary);
-}
-
 /* Hero Section */
 .hero {
     position: relative;
