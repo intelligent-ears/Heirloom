@@ -1,0 +1,32 @@
+# Node / pnpm
+node_modules/
+.pnpm-store/
+.pnpm/
+
+# Build outputs
+dist/
+build/
+coverage/
+
+# Vite
+.vite/
+
+# Env files
+.env
+.env.*
+
+# OS
+.DS_Store
+
+# Logs
+*.log
+
+# Lockfiles from other package managers
+package-lock.json
+yarn.lock
+
+# Sui / Move / Foundry artifacts
+.sui/
+.move/
+foundry-out/
+cache/
