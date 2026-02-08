@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { useAccount } from 'wagmi'
 import {
@@ -100,11 +101,128 @@ function VaultCard({ vault }: { vault: any }) {
 }
 
 function Dashboard() {
+    const navigate = useNavigate()
     const { address, isConnected } = useAccount()
     const { vaults, isLoading } = useVaults(address)
+    const [kycStatus, setKycStatus] = useState<'idle' | 'checking' | 'needs_verification' | 'pending' | 'verified' | 'error'>('idle')
+    const [kycError, setKycError] = useState<string | null>(null)
+    const [requestId, setRequestId] = useState<string | null>(null)
+    const [nullifierHash, setNullifierHash] = useState('')
+    const [proof, setProof] = useState('')
+    const [isStarting, setIsStarting] = useState(false)
+    const [isVerifying, setIsVerifying] = useState(false)
+
+    const hasuraEndpoint = import.meta.env.VITE_HASURA_GRAPHQL_ENDPOINT ?? 'http://localhost:8080/v1/graphql'
+    const backendUrl = import.meta.env.VITE_BACKEND_URL ?? 'http://localhost:3001'
+    const isDevMode = (import.meta.env.VITE_PRIVADO_DEV_MODE ?? 'false') === 'true'
+
+    useEffect(() => {
+        if (!isConnected || !address) {
+            setKycStatus('idle')
+            setKycError(null)
+            return
+        }
+
+        const checkWallet = async () => {
+            try {
+                setKycStatus('checking')
+                setKycError(null)
+
+                const response = await fetch(hasuraEndpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-hasura-role': 'user',
+                        'x-hasura-wallet-address': address
+                    },
+                    body: JSON.stringify({
+                        query: `query CheckUser($wallet: String!) { users(where: { wallet_address: { _eq: $wallet } }) { id } }`,
+                        variables: { wallet: address }
+                    })
+                })
+
+                const data = await response.json()
+                if (data.errors?.length) {
+                    throw new Error(data.errors[0].message)
+                }
+
+                const exists = (data.data?.users ?? []).length > 0
+                setKycStatus(exists ? 'verified' : 'needs_verification')
+            } catch (error) {
+                const message = error instanceof Error ? error.message : 'Failed to check wallet'
+                setKycError(message)
+                setKycStatus('error')
+            }
+        }
+
+        checkWallet()
+    }, [address, hasuraEndpoint, isConnected])
+
+    const startVerification = async () => {
+        if (!address) return
+        try {
+            setIsStarting(true)
+            setKycError(null)
+
+            const response = await fetch(`${backendUrl}/privado/start`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ walletAddress: address })
+            })
+
+            const data = await response.json()
+            if (!response.ok) {
+                throw new Error(data.error ?? 'Failed to start verification')
+            }
+
+            setRequestId(data.requestId)
+            setNullifierHash(crypto.randomUUID())
+            setProof('dev-proof')
+            setKycStatus('pending')
+        } catch (error) {
+            const message = error instanceof Error ? error.message : 'Failed to start verification'
+            setKycError(message)
+            setKycStatus('error')
+        } finally {
+            setIsStarting(false)
+        }
+    }
+
+    const submitVerification = async () => {
+        if (!address || !requestId) return
+        try {
+            setIsVerifying(true)
+            setKycError(null)
+
+            const response = await fetch(`${backendUrl}/privado/verify`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    requestId,
+                    walletAddress: address,
+                    nullifierHash,
+                    proof
+                })
+            })
+
+            const data = await response.json()
+            if (!response.ok) {
+                throw new Error(data.error ?? 'Verification failed')
+            }
+
+            setKycStatus('verified')
+        } catch (error) {
+            const message = error instanceof Error ? error.message : 'Verification failed'
+            setKycError(message)
+            setKycStatus('error')
+        } finally {
+            setIsVerifying(false)
+        }
+    }
 
     const totalBalance = vaults.reduce((sum, v) => sum + parseFloat(v.balance), 0)
     const totalUsd = vaults.reduce((sum, v) => sum + parseFloat(v.balanceUsd.replace(',', '')), 0)
+    const canCreateVault = kycStatus === 'verified'
 
     return (
         <div className="dashboard">
@@ -143,10 +261,80 @@ function Dashboard() {
                                     <h1>Your Vaults</h1>
                                     <p>Manage your legacy vaults and send heartbeats</p>
                                 </div>
-                                <Link to="/create" className="btn btn-primary">
+                                <button
+                                    className="btn btn-primary"
+                                    onClick={() => canCreateVault && navigate('/create')}
+                                    disabled={!canCreateVault}
+                                >
                                     <Plus size={20} />
-                                    Create Vault
-                                </Link>
+                                    {canCreateVault ? 'Create Vault' : 'Verify to Create'}
+                                </button>
+                            </div>
+
+                            <div className="kyc-card">
+                                <div className="kyc-header">
+                                    <div>
+                                        <h3>Identity Verification</h3>
+                                        <p>One human = one account. Verify once to create vaults.</p>
+                                    </div>
+                                    <span className={`kyc-status kyc-${kycStatus}`}>
+                                        {kycStatus === 'checking' && 'Checking'}
+                                        {kycStatus === 'needs_verification' && 'Not verified'}
+                                        {kycStatus === 'pending' && 'Pending'}
+                                        {kycStatus === 'verified' && 'Verified'}
+                                        {kycStatus === 'error' && 'Error'}
+                                        {kycStatus === 'idle' && 'Connect wallet'}
+                                    </span>
+                                </div>
+
+                                {isDevMode && (
+                                    <p className="kyc-warning">
+                                        Demo mode: verification proof is stubbed.
+                                    </p>
+                                )}
+                                {kycError && <p className="kyc-error">{kycError}</p>}
+
+                                {kycStatus !== 'verified' && (
+                                    <div className="kyc-actions">
+                                        <button
+                                            className="btn btn-secondary"
+                                            onClick={startVerification}
+                                            disabled={isStarting || !isConnected}
+                                        >
+                                            {isStarting ? 'Starting...' : 'Start Verification'}
+                                        </button>
+
+                                        {requestId && (
+                                            <div className="kyc-form">
+                                                <div className="kyc-field">
+                                                    <label>Request ID</label>
+                                                    <input value={requestId} readOnly />
+                                                </div>
+                                                <div className="kyc-field">
+                                                    <label>Nullifier Hash</label>
+                                                    <input
+                                                        value={nullifierHash}
+                                                        onChange={(e) => setNullifierHash(e.target.value)}
+                                                    />
+                                                </div>
+                                                <div className="kyc-field">
+                                                    <label>Proof (dev mode)</label>
+                                                    <input
+                                                        value={proof}
+                                                        onChange={(e) => setProof(e.target.value)}
+                                                    />
+                                                </div>
+                                                <button
+                                                    className="btn btn-primary"
+                                                    onClick={submitVerification}
+                                                    disabled={isVerifying || !nullifierHash || !proof}
+                                                >
+                                                    {isVerifying ? 'Verifying...' : 'Submit Verification'}
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
                             </div>
 
                             {/* Stats Overview */}

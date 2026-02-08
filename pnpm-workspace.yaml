@@ -1,5 +1,6 @@
 packages:
-  - 'frontend'
-  - 'contracts-sui'
-  - 'contracts-eth'
-  - 'agent'
+  - "frontend"
+  - "contracts-sui"
+  - "contracts-eth"
+  - "backend"
+  - "agent"
