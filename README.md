@@ -1,71 +1,158 @@
-# 🏺 Heirloom
+# Heirloom – DeFi Legacy Protocol 🧬
 
-> _"Your legacy, forever on-chain."_
+**On-Chain Will & Inheritance Framework**  
+*"Your legacy, forever on-chain."*
 
-**Cross-chain inheritance protocol with cryptographic proof-of-life mechanisms.**
+---
 
-## 🎯 The Problem
+## 📌 Overview
 
-$100B+ in cryptocurrency is estimated to be lost due to forgotten keys and sudden death. Traditional inheritance systems don't work for digital assets - lawyers can't access private keys, courts can't decrypt wallets.
+**Heirloom (DeFi Legacy)** is a cross-chain inheritance protocol that automates digital asset transfers using **cryptographic proof-of-life** mechanisms. It solves the long-standing problem of lost private keys and ensures secure, fair, and market-safe inheritance of crypto assets.
 
-## 💡 The Solution
+Built as decentralized infrastructure, Heirloom combines **identity, smart contract logic, decentralized storage, and automated execution** to preserve generational wealth.
 
-**Heirloom** automates digital asset inheritance through:
+---
 
-- **Proof-of-Life**: Periodic "heartbeat" transactions confirm you're still active
-- **Grace Period**: Configurable delay (30-365 days) before settlement begins
-- **Gradual Liquidation**: Market-safe distribution via Uniswap v4 hooks
-- **ENS Identity**: Inherit by name, not address (grandfather.eth → grandson.eth)
+## ❗ Problem 
+
+Over **$100B+ worth of crypto assets** are inaccessible due to lost keys or death. Traditional inheritance systems fail because:
+
+- Private keys die with owners  
+- No native crypto inheritance frameworks  
+- Legal wills don’t work on-chain  
+- Sudden liquidation harms heirs and markets  
+
+---
+
+## 💡 Solution
+
+Heirloom introduces:
+- Proof-of-life heartbeats  
+- Automated settlement after inactivity  
+- Age-locked inheritance for minors  
+- Social recovery via guardians  
+- Market-safe liquidation mechanisms  
+
+All enforced **trustlessly by smart contracts**.
+
+---
 
 ## 🏗️ Architecture
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                      Heirloom Protocol                      │
-├─────────────────┬─────────────────┬─────────────────────────┤
-│   Sui Network   │   Ethereum L1   │       Frontend          │
-├─────────────────┼─────────────────┼─────────────────────────┤
-│ • LegacyVault   │ • Liquidation   │ • React + Vite          │
-│ • Heartbeat FSM │   Hook (v4)     │ • RainbowKit            │
-│ • Guardians     │ • ENS Text      │ • Sui dApp Kit          │
-│                 │   Records       │                         │
-└─────────────────┴─────────────────┴─────────────────────────┘
-```
-
-## 🚀 Quick Start
-
-```bash
-# Install dependencies
-pnpm install
-
-# Run frontend
-cd frontend && pnpm dev
-
-# Build Sui contracts (requires Sui CLI)
-cd contracts-sui && sui move build
-
-# Build ETH contracts (requires Foundry)
-cd contracts-eth && forge build
-```
-
-## 📁 Project Structure
+### High-Level Protocol Flow
 
 ```
-Heirloom/
-├── frontend/           # React + Vite + RainbowKit
-├── contracts-sui/      # Sui Move (LegacyVault)
-├── contracts-eth/      # Solidity (Uniswap v4 hooks + ENS)
-└── agent/              # Liquidation automation
+┌────────────────────────────────────────────┐
+│           User Interface Layer             │
+│   ENS Identity + Social Recovery Dashboard │
+└───────────────────────┬────────────────────┘
+                        │
+                        ▼
+┌────────────────────────────────────────────┐
+│       Logic & State Layer (Sui Move)       │
+│  • Heartbeat Monitoring                    │
+│  • Grace Period State Machine              │
+│  • Age Locks for Minors                    │
+│  • Guardian Voting Logic                   │
+└───────────────────────┬────────────────────┘
+                        │
+                        ▼
+┌────────────────────────────────────────────┐
+│       Storage Layer (Walrus / IPFS)        │
+│  • Encrypted Video Wills                   │
+│  • Legal PDFs & Instructions               │
+│  • Zero-Knowledge Privacy                  │
+└───────────────────────┬────────────────────┘
+                        │
+                        ▼
+┌────────────────────────────────────────────┐
+│    Execution Layer (Uniswap v4 Hooks)      │
+│  • Gradual Asset Liquidation               │
+│  • TWAP-Based Price Protection             │
+│  • Multi-Asset Distribution                │
+└────────────────────────────────────────────┘
 ```
 
-## 🏆 HackMoney 2026 Tracks
+---
 
-| Track          | Prize | Our Integration                           |
-| -------------- | ----- | ----------------------------------------- |
-| **Sui**        | $10K  | Core vault logic, heartbeat state machine |
-| **Uniswap v4** | $10K  | Gradual liquidation hooks                 |
-| **ENS**        | $5K   | Heir resolution, text records             |
+## 🔁 Core User Flow
 
+### 1️⃣ Will Creation
+- Wallet + ENS verification  
+- Heir designation  
+- Heartbeat configuration  
+- Asset deposit  
+- Optional guardian setup  
+
+### 2️⃣ Active Monitoring
+- Periodic heartbeat transactions  
+- Multi-stage alerts (Email, SMS, XMTP)  
+
+### 3️⃣ Settlement
+- Triggered after inactivity  
+- Keys released to heir  
+- Assets distributed gradually  
+
+### 4️⃣ Claim
+- Instant access if heir is adult  
+- Trust mode if heir is a minor  
+
+---
+
+## 🧰 Technology Stack
+
+| Layer | Technology |
+|------|-----------|
+| Identity | ENS |
+| Smart Contracts | Sui Move |
+| Storage | Walrus, IPFS |
+| Execution | Uniswap v4 |
+| Messaging | XMTP |
+| Governance | DAO + Multisig |
+
+---
+
+## 🛡️ Security & Privacy
+
+- Encrypted off-chain storage  
+- Zero-knowledge access control  
+- Multi-sig guardian recovery  
+- Time-locks and circuit breakers  
+- Insurance fund via protocol fees  
+
+---
+
+## 🚀 Key Differentiators
+
+- Automated proof-of-life  
+- Built-in trust for minors  
+- Market-safe liquidation  
+- Fully self-custodial  
+- Cross-generational inheritance  
+
+---
+
+## 🗺️ Roadmap
+
+**MVP:** Ethereum + Sui, heartbeat, ETH inheritance  
+**V1:** Mainnet, Walrus, social recovery  
+**V2:** Cross-chain, Uniswap hooks  
+**V3:** Dynasty trusts, NFT inheritance  
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome:
+- Smart contract improvements  
+- UI enhancements  
+- Security research  
+- Documentation  
+
+---
 ## 📄 License
 
-MIT — see [LICENSE](LICENSE).
+MIT License
+
+---
+**Built with ❤️, for HackMoney 2026**
