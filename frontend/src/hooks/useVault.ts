@@ -17,37 +17,6 @@ export interface Vault {
     encryptedWillCid?: string
 }
 
-// Mock data for demo
-const MOCK_VAULTS: Vault[] = [
-    {
-        id: '2847',
-        grantor: '0x1234...5678',
-        grantorEns: 'grandfather.eth',
-        heir: '0xabcd...ef01',
-        heirEns: 'grandson.eth',
-        balance: '10.5',
-        balanceUsd: '42,000',
-        lastHeartbeat: Date.now() - 23 * 24 * 60 * 60 * 1000, // 23 days ago
-        gracePeriodDays: 180,
-        status: 'active',
-        guardians: ['0x1111...2222', '0x3333...4444', '0x5555...6666'],
-        guardianThreshold: 2,
-    },
-    {
-        id: '1293',
-        grantor: '0x9876...5432',
-        grantorEns: 'alice.eth',
-        heir: '0xfedc...ba98',
-        heirEns: 'bob.eth',
-        balance: '5.2',
-        balanceUsd: '20,800',
-        lastHeartbeat: Date.now() - 165 * 24 * 60 * 60 * 1000, // 165 days ago
-        gracePeriodDays: 180,
-        status: 'warning',
-        guardians: [],
-        guardianThreshold: 0,
-    },
-]
 
 /**
  * Hook to fetch user's vaults
@@ -56,6 +25,7 @@ export function useVaults(userAddress: string | undefined) {
     const [vaults, setVaults] = useState<Vault[]>([])
     const [isLoading, setIsLoading] = useState(true)
     const [error, setError] = useState<Error | null>(null)
+    const hasuraEndpoint = import.meta.env.VITE_HASURA_GRAPHQL_ENDPOINT ?? 'http://localhost:8080/v1/graphql'
 
     useEffect(() => {
         if (!userAddress) {
@@ -64,13 +34,47 @@ export function useVaults(userAddress: string | undefined) {
             return
         }
 
-        // Simulate API call
         const fetchVaults = async () => {
             try {
                 setIsLoading(true)
-                // TODO: Replace with actual Sui RPC call
-                await new Promise(resolve => setTimeout(resolve, 1000))
-                setVaults(MOCK_VAULTS)
+                const response = await fetch(hasuraEndpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-hasura-role': 'user',
+                        'x-hasura-wallet-address': userAddress
+                    },
+                    body: JSON.stringify({
+                        query: `query Vaults($wallet: String!) {\n  vaults(where: { grantor_wallet: { _eq: $wallet } }) {\n    id\n    grantor_wallet\n    grantor_ens\n    heir_wallet\n    heir_ens\n    balance\n    balance_usd\n    last_heartbeat\n    grace_period_days\n    status\n    guardians\n    guardian_threshold\n    maturity_timestamp\n    encrypted_will_cid\n    created_at\n  }\n}`,
+                        variables: { wallet: userAddress }
+                    })
+                })
+
+                const data = await response.json()
+                if (data.errors?.length) {
+                    throw new Error(data.errors[0].message)
+                }
+
+                const mapped: Vault[] = (data.data?.vaults ?? []).map((vault: any) => ({
+                    id: vault.id,
+                    grantor: vault.grantor_wallet,
+                    grantorEns: vault.grantor_ens ?? undefined,
+                    heir: vault.heir_wallet,
+                    heirEns: vault.heir_ens,
+                    balance: Number(vault.balance ?? 0).toString(),
+                    balanceUsd: Number(vault.balance_usd ?? 0).toLocaleString(),
+                    lastHeartbeat: new Date(vault.last_heartbeat).getTime(),
+                    gracePeriodDays: vault.grace_period_days,
+                    status: vault.status,
+                    guardians: vault.guardians ?? [],
+                    guardianThreshold: vault.guardian_threshold ?? 0,
+                    maturityTimestamp: vault.maturity_timestamp
+                        ? new Date(vault.maturity_timestamp).getTime()
+                        : undefined,
+                    encryptedWillCid: vault.encrypted_will_cid ?? undefined,
+                }))
+
+                setVaults(mapped)
                 setError(null)
             } catch (err) {
                 setError(err as Error)
@@ -80,7 +84,7 @@ export function useVaults(userAddress: string | undefined) {
         }
 
         fetchVaults()
-    }, [userAddress])
+    }, [userAddress, hasuraEndpoint])
 
     return { vaults, isLoading, error }
 }

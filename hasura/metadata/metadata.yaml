@@ -1,0 +1,57 @@
+version: 3
+sources:
+  - name: default
+    kind: postgres
+    tables:
+      - table:
+          schema: public
+          name: users
+        select_permissions:
+          - role: user
+            permission:
+              columns:
+                - id
+                - wallet_address
+                - did
+                - credential_hash
+                - created_at
+              filter:
+                wallet_address:
+                  _eq: X-Hasura-Wallet-Address
+      - table:
+          schema: public
+          name: identity_nullifiers
+      - table:
+          schema: public
+          name: vaults
+        select_permissions:
+          - role: user
+            permission:
+              columns:
+                - id
+                - grantor_wallet
+                - grantor_ens
+                - heir_wallet
+                - heir_ens
+                - balance
+                - balance_usd
+                - last_heartbeat
+                - grace_period_days
+                - status
+                - guardians
+                - guardian_threshold
+                - maturity_timestamp
+                - encrypted_will_cid
+                - created_at
+              filter:
+                grantor_wallet:
+                  _eq: X-Hasura-Wallet-Address
+    configuration:
+      connection_info:
+        database_url:
+          from_env: HASURA_DATABASE_URL
+        pool_settings: {}
+        use_prepared_statements: true
+        isolation_level: read-committed
+        ssl_configuration:
+          sslmode: disable

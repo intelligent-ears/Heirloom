@@ -7,13 +7,17 @@
     "frontend",
     "contracts-sui",
     "contracts-eth",
+    "backend",
     "agent"
   ],
   "scripts": {
     "dev": "pnpm --filter frontend dev",
     "build": "pnpm --filter frontend build",
     "test:sui": "cd contracts-sui && sui move test",
-    "test:eth": "cd contracts-eth && forge test"
+    "test:eth": "cd contracts-eth && forge test",
+    "hasura:migrate:apply": "npx hasura-cli@latest migrate apply --database-name default --project hasura",
+    "hasura:metadata:apply": "npx hasura-cli@latest metadata apply --project hasura",
+    "hasura:apply": "pnpm run hasura:migrate:apply && pnpm run hasura:metadata:apply"
   },
   "keywords": [
     "defi",
@@ -24,5 +28,13 @@
     "web3"
   ],
   "author": "DeFi Legacy Team",
-  "license": "MIT"
+  "license": "MIT",
+  "pnpm": {
+    "overrides": {
+      "@noble/curves": "1.2.0",
+      "@iden3/js-jwz>@noble/curves": "1.2.0",
+      "@iden3/js-iden3-auth>@noble/curves": "1.2.0",
+      "@0xpolygonid/js-sdk>@noble/curves": "1.2.0"
+    }
+  }
 }
